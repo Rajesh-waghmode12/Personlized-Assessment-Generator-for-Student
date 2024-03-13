@@ -1,0 +1,41 @@
+.recent-tests-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two equal columns */
+  gap: 20px;
+  padding: 20px;
+}
+
+.header {
+  grid-column: 1 / -1; /* Header will span across all columns */
+  background-color: #4B79A1; /* Dark blue background */
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 24px;
+  display: flex;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.username{
+  flex: 90%;
+}
+.logout-btn{
+  flex: 5%;
+}
+  
+  .recent-tests-container ul {
+    list-style: none;
+    padding: 0;
+    text-decoration: none;
+  }
+  
+  .recent-tests-container li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+    text-decoration: none;
+  } 
+ 

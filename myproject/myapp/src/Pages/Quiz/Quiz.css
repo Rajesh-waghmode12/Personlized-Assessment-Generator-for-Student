@@ -1,0 +1,50 @@
+.quiz-container {
+    width: 80%;
+    margin: auto;
+    background: #f4f4f4;
+  }
+  
+  .quiz-header {
+    background-color: #F2845C;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .question {
+    background-color: #A0D3F2;
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .options {
+    margin: 10px 0;
+    padding: 10px;
+    
+  }
+
+  
+  
+  .options label {
+    margin-right: 10px;
+    
+  }
+  
+  .submit-btn {
+    background-color: #ffa07a;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+    justify-content: center;
+  }
+  
+  .submit-btn:hover {
+    background-color: #ff7f50;
+  }
+  
