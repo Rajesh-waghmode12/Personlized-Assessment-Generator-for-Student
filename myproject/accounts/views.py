@@ -145,7 +145,10 @@ def createTest_view(request):
 def get_test_titles(request):
     #print("in get_test_titles view")
     if request.method == 'GET':
-        test_titles = Assignment.objects.values_list('title', flat=True)
+        username = request.GET.get('username')
+        teacher_id = get_teacher_id(username)
+        #test_titles = Assignment.objects.values_list('title', flat=True)
+        test_titles = Assignment.objects.filter(Teacher_id=teacher_id).values_list('title', flat=True)
         test_titles_list = list(test_titles)
         return JsonResponse({"test_titles": test_titles_list}, status=200)
     else:

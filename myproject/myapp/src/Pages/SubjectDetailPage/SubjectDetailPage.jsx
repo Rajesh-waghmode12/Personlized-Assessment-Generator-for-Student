@@ -8,11 +8,12 @@ function SubjectDetailPage(){
   const { username } = useParams();
 
   const [testTitles, setTestTitles] = useState([]);
+  
 
   useEffect(()=>{
     const fetchData = async () =>{
         try {
-          const response = await fetch('http://localhost:8000/tests/',{
+          const response = await fetch(`http://localhost:8000/tests/?username=${username}`,{
             method : 'GET',
             headers : {
               'content-Type' : 'application/json'
@@ -30,7 +31,8 @@ function SubjectDetailPage(){
         }
     }
     fetchData();
-  },[])
+
+  },[username]);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   return (
