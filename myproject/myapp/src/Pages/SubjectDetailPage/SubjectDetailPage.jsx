@@ -8,6 +8,30 @@ function SubjectDetailPage(){
   const { username } = useParams();
 
   const [testTitles, setTestTitles] = useState([]);
+  const [members, setmembers] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () =>{
+      try {
+        const response = await fetch(`http://localhost:8000/getmembers/?username=${username}`,{
+          method : 'GET',
+          headers : {
+            'content-Type' : 'application/json'
+          }
+        })
+        if(!response.ok){
+          throw new Error("Network response was not okay");
+        }
+
+        const data = await response.json();
+        console.log('member names:', data.member_list);
+        setmembers(data.member_list);
+      }catch(error){
+        console.error('Error fetching momber:', error);
+      }
+  }
+  fetchData();
+  },[username]);
   
 
   useEffect(()=>{
@@ -24,6 +48,7 @@ function SubjectDetailPage(){
           }
 
           const data = await response.json();
+          console.log(data);
           console.log('Test Titles:', data.test_titles);
           setTestTitles(data.test_titles);
         }catch(error){
@@ -52,10 +77,14 @@ function SubjectDetailPage(){
         
       </div>
       <div className="subject-section">
+        
         <h2>Members</h2>
+        {members.map((member, index) => (
+          <div key={index} className="test-date">{member}</div>
+        ))}
         
         <button onClick={() => setIsModalOpen(true)}>Add Member</button>
-        <AddMemberModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+        <AddMemberModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} username={username} />
       </div>
     </div>
   );

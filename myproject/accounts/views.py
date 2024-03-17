@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import UserProfile, Teacher, Student , Assignment
+from .models import UserProfile, Teacher, Student , Assignment , StudentsClass
 from django.contrib.auth.models import User
 from django.db import transaction
 import json
@@ -102,13 +102,6 @@ def create_student(user_profile, mobile, full_name):
         # Log or handle the exception as needed
         return None
     
-def get_teacher_id(fullname):
-    try:
-        teacher = Teacher.objects.get(full_name= fullname)  # Assuming 'username' is the field in the Teacher model
-        return teacher.teacher_id
-    except Teacher.DoesNotExist:
-        # Handle the case where the teacher does not exist
-        return None
 @transaction.atomic
 def createTest_view(request):
     if request.method == 'POST':
@@ -117,14 +110,16 @@ def createTest_view(request):
         title = data.get('title')
         totalmarks = (int)(data.get('totalmarks'))
         test = data.get('test')
+        
+        teacher = Teacher.objects.get(full_name=username)
+        teacher_id = teacher.teacher_id
+        print(teacher_id)
 
-        teacher_id = get_teacher_id(username)
-
-        print("username",username)
-        print("title",title)
-        print("totalmarks",totalmarks)
-        print(test)
-        print("teacher id",teacher_id)
+        # print("username",username)
+        # print("title",title)
+        # print("totalmarks",totalmarks)
+        # print(test)
+        # print("teacher id",teacher_id)
         try:
             assignment = Assignment.objects.create(
                 Teacher_id = teacher_id,
@@ -146,10 +141,86 @@ def get_test_titles(request):
     #print("in get_test_titles view")
     if request.method == 'GET':
         username = request.GET.get('username')
-        teacher_id = get_teacher_id(username)
+        teacher = Teacher.objects.get(full_name=username)
+        teacher_id = teacher.teacher_id
         #test_titles = Assignment.objects.values_list('title', flat=True)
         test_titles = Assignment.objects.filter(Teacher_id=teacher_id).values_list('title', flat=True)
         test_titles_list = list(test_titles)
         return JsonResponse({"test_titles": test_titles_list}, status=200)
+    else:
+        return JsonResponse({"error": "Only GET requests are allowed"}, status=405)
+
+def getmembers(request):
+    if request.method == 'GET':
+        username = request.GET.get('username')
+        teacher = Teacher.objects.get(full_name=username)
+        teacher_id = teacher.teacher_id
+        #test_titles = Assignment.objects.values_list('title', flat=True)
+        members = StudentsClass.objects.filter(Teacher_id=teacher_id).values_list('sname', flat=True)
+        member_list = list(members)
+        return JsonResponse({"member_list": member_list}, status=200)
+    else:
+        return JsonResponse({"error": "Only GET requests are allowed"}, status=405)
+    
+def saveStudentInClass_view(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        name = data.get('name')
+        mobile = data.get('mobile')
+        email = data.get('email')
+        username = data.get('username')
+        teacher = Teacher.objects.get(full_name=username)
+        teacher_id = teacher.teacher_id
+        print(name,email,mobile, "teacher usernme-",username, teacher_id)
+        try:
+            addStudent = StudentsClass.objects.create(
+                sname = name, 
+                smobile = mobile,
+                semail = email,
+                Teacher_id = teacher_id
+            )
+            addStudent.save()
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+        return JsonResponse({"message": "Data received successfully"}, status=200)
+
+def getRecentTestsForStudent(request):
+    if request.method == 'GET':
+        username = request.GET.get('username')
+        #print(username)
+        students_classes = StudentsClass.objects.filter(sname="vishal")
+        unique_teacher_ids = students_classes.values_list('Teacher_id', flat=True).distinct()
+        # for id in unique_teacher_ids:
+        #     print(id)
+        assignments = Assignment.objects.filter(Teacher_id__in=unique_teacher_ids)
+        #unique_titles = assignments.values_list('title', flat=True).distinct()
+        unique_ids = assignments.values_list('assignment_id', flat=True).distinct()
+        unique_titles = Assignment.objects.filter(assignment_id__in=unique_ids).values_list('title', flat=True)
+        
+        unique_titles_list = list(unique_titles)
+        unique_test_ids = list(unique_ids)
+
+        # for title, id in zip(unique_titles, unique_ids):
+        #     print(title, " ", id)
+        # for id in uniques_test_ids:
+        #     print(id)
+
+        return JsonResponse({"unique_titles_list": unique_titles_list,"unique_ids":unique_test_ids }, status=200)
+    else:
+        return JsonResponse({"error": "Only GET requests are allowed"}, status=405)
+
+def getTestQuestions(request):
+    if request.method == 'GET':
+        id = request.GET.get('id')
+        print(id)
+        allQuestions = Assignment.objects.filter(assignment_id = id).values('assignment_json')
+        allQuestions_list = list(allQuestions)
+
+        # Print the list of JSON objects
+        print("Assignment JSON:")
+        print(allQuestions_list)
+        return JsonResponse({"allTestQuestions": allQuestions_list}, status=200)
     else:
         return JsonResponse({"error": "Only GET requests are allowed"}, status=405)

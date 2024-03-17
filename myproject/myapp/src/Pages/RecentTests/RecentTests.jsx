@@ -3,32 +3,36 @@ import { Link, useParams } from 'react-router-dom';
 import './RecentTests.css'
 
 const RecentTests = () => {
-  const [tests, setTests] = useState([]);
+  const [testTitles, setTestTitles] = useState([]);
+  const [testIds, setTestIds] = useState([]);
   const { username } = useParams();
 
-  useEffect(() => {
-    // Here you would replace this with an actual API call to your backend
+  useEffect(()=>{
     const fetchData = async () =>{
-      try {
-        const response = await fetch('http://localhost:8000/tests/',{
-          method : 'GET',
-          headers : {
-            'content-Type' : 'application/json'
+        try {
+          const response = await fetch(`http://localhost:8000/recentTestForStudent/?username=${username}`,{
+            method : 'GET',
+            headers : {
+              'content-Type' : 'application/json'
+            }
+          })
+          if(!response.ok){
+            throw new Error("Network response was not okay");
           }
-        })
-        if(!response.ok){
-          throw new Error("Network response was not okay");
-        }
 
-        const data = await response.json();
-        console.log('Test Titles:', data.test_titles);
-        setTests(data.test_titles);
-      }catch(error){
-        console.error('Error fetching test titles:', error);
-      }
-  }
-  fetchData();
-},[])
+          const data = await response.json();
+          console.log('Test Titles:', data.unique_titles_list);
+          console.log('Test ids:', data.unique_ids);
+          setTestTitles(data.unique_titles_list);
+          setTestIds(data.unique_ids);
+        }
+        catch(error){
+          console.error('Error fetching test titles:', error);
+        }
+    }
+    fetchData();
+
+  },[username]);
 
   return (
     <div className="recent-tests-container">
@@ -40,16 +44,20 @@ const RecentTests = () => {
       </div>
       <div className="recent-test">
       <h2>Recent Tests</h2>
-      <ul>
-      <Link to="/quiz">
-        {tests.map((title, index) => (
-          <li key={index}>
-            {title}
-            <button>→</button>
-          </li>
+      <div>
+      
+        
+        {testIds.map((id, index) => (
+          <Link to={`/quiz/${id}`} key={index}>
+        <div className='tests-list' key={index}>
+         <input className='ids' type="text" value={id} readOnly/>
+         <input type="text" value={testTitles[index]} readOnly/>
+          <button>→</button>
+        </div>
+         </Link>
         ))}
-        </Link>
-      </ul>
+       
+        </div>
       </div>
     </div>
   );

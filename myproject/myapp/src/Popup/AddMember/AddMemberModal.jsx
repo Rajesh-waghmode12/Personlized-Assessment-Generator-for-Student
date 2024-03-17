@@ -1,19 +1,38 @@
 import React, { useState } from 'react';
 import './AddMemberModal.css'; // Make sure to create a corresponding CSS file
 
-function AddMemberModal({ isOpen, onClose }) {
+function AddMemberModal({ isOpen, onClose, username }) {
   const [name, setName] = useState('');
   const [mobile, setMobile] = useState('');
   const [email, setEmail] = useState('');
 
-  const handleAdd = () => {
-    // Logic to add the member
-    console.log(name, mobile, email);
-    // After adding, you can clear the fields or close the modal
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    console.log(name, mobile, email,"teacher - username - ",username);
     setName('');
     setMobile('');
     setEmail('');
-    onClose(); // Close the modal
+    onClose(); 
+    const formData = {
+      username : username,
+      name : name,
+      mobile : mobile,
+      email : email
+    };
+  try {
+      const response = await fetch('http://localhost:8000/addStudentinclass/',{
+        method : 'POST',
+        headers : {
+          'content-Type' : 'application/json'
+        },
+        body : JSON.stringify(formData)
+      });
+      if (response.ok) {
+        alert("Member added");
+      }
+  }catch(error){
+    console.log(error);
+  }
   };
 
   if (!isOpen) {

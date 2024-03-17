@@ -29,4 +29,8 @@ urlpatterns = [
     path("whoami/",views.whoami_view, name="api_whoami"),
     path("testCreation/",views.createTest_view, name="api_createTest"),
     path('tests/', views.get_test_titles, name='get_test_titles'),
+    path("getmembers/",views.getmembers , name = "getmembers_view"),
+    path('addStudentinclass/', views.saveStudentInClass_view, name='saveStudentInClass'),
+    path("recentTestForStudent/", views.getRecentTestsForStudent, name='getrecentTestView'),
+    path("getTestQuestions/",views.getTestQuestions,name="getTestQuestions")
 ]

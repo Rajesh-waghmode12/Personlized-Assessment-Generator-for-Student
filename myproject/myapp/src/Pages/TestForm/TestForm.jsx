@@ -63,7 +63,7 @@ const TestForm = () => {
           alert("Assignment created",response.assignment_id);
         }
     }catch(error){
-
+      console.log(error);
     }
 
   }
@@ -84,7 +84,7 @@ const TestForm = () => {
               Logout
           </button>
         </div>
-          <form onSubmit={submitForm}>
+          <form> {/* onSubmit={submitForm} */}
             <div className='title-marks-field'>
 
               <input type="text" name='question' placeholder='Enter title here' 
@@ -134,7 +134,7 @@ const TestForm = () => {
             </div>
             )
             })}
-            <button onClick={addFields} className='addmor-button'>Add More..</button>
+            <button type="button" onClick={addFields} className='addmor-button'>Add More..</button>
             <button onClick={submitForm} className='submit-button'>Submit</button>
           </form>
         </div>

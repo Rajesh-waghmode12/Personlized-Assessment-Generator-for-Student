@@ -68,3 +68,12 @@ class Assignment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     class_id = models.IntegerField(null=True)
+
+class StudentsClass(models.Model):
+    sid = models.AutoField(primary_key=True)
+    sname = models.CharField(max_length=255, unique=False)
+    smobile = models.CharField(max_length=20, unique=False)
+    semail = models.EmailField(unique=False)
+    Teacher_id = models.IntegerField(unique = False)
+    join_date = models.DateTimeField(auto_now = True)
+    release_date = models.DateTimeField(auto_now_add=True)

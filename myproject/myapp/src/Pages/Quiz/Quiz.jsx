@@ -1,78 +1,70 @@
 import React, { useState, useEffect } from 'react';
 import './Quiz.css';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 const Quiz = () => {
-  const [questions, setQuestions] = useState([]);
+  const { id } = useParams();
+  //console.log(id);
+  const [testQuestions, setTestQuestions] = useState([]);
 
   useEffect(() => {
-    // Here you would fetch the questions from your API
-    // This is a placeholder for where you would make the API call
     const fetchQuestions = async () => {
-      // const response = await fetch('your-api-endpoint');
-      // const data = await response.json();
-      const data = [
-        {
-          id: 1,
-          questionText: 'Question 1',
-          options: ['Option 1', 'Option 2', 'Option 3', 'Option 4'],
-        },
-        {
-          id: 2,
-          questionText: 'Question 2',
-          options: ['Option 1', 'Option 2', 'Option 3', 'Option 4'],
-        },
-        // ... more questions
-      ];
-      setQuestions(data);
+      const response = await fetch(`http://localhost:8000/getTestQuestions/?id=${id}`);
+      //const data = await response.json();
+      const data1 = await response.json();
+      setTestQuestions(data1.allTestQuestions[0].assignment_json)
+      const data2 = data1.allTestQuestions[0].assignment_json;
+      setTestQuestions(data2);
+
+        // Log the first question and its options
+        // console.log("Question:", testQuestions[0].question);
+        // console.log("Options:");
+        // console.log("Option 1:", testQuestions[0].option1);
+        // console.log("Option 2:", testQuestions[0].option2);
+        // console.log("Option 3:", testQuestions[0].option3);
+        // console.log("Option 4:", testQuestions[0].option4);
+        // console.log("Mark:", testQuestions[0].mark);
+    
     };
 
     fetchQuestions();
-  }, []);
-
-  const [selectedOptions, setSelectedOptions] = useState({});
-
-  const handleOptionChange = (questionId, option) => {
-    setSelectedOptions(prevState => ({
-      ...prevState,
-      [questionId]: option
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Here you would handle the submission of the answers
-    // Likely sending them to your API
-    alert('Submit answers');
-  };
+  }, [id]);
 
   return (
     <div className="quiz-container">
-      <h1 className="quiz-header">Test Title/Date</h1>
-      <form onSubmit={handleSubmit}>
-        {questions.map((question) => (
-          <div key={question.id} className="question">
-            <h3>{question.questionText}</h3>
-            <div className="options">
-              {question.options.map((option, index) => (
-                <label key={index}>
-                  <input
-                    type="radio"
-                    value={option}
-                    name={`question_${question.id}`}
-                    checked={selectedOptions[question.id] === option}
-                    onChange={() => handleOptionChange(question.id, option)}
-                  />
-                  {option}
-                </label>
-              ))}
+      <h1 className="quiz-header">title</h1>
+      {testQuestions.length > 0 ? (
+        testQuestions.map((question, index) => (
+          <div key={index}>
+            <p>Question: {question.question} <label>Mark: {question.mark}</label></p>
+            <p>Options:</p>
+            <div>
+              <label for={question.option1}>{question.option1}</label>
+              <input type="radio" name={question.question} value={question.option1}/>
+            </div>
+        
+            <div>
+              <label for={question.option2}>{question.option1}</label>
+              <input type="radio" name={question.question} value={question.option2}/>
+            </div>
+
+             <div>
+              <label for={question.option3}>{question.option1}</label>
+              <input type="radio" name={question.question} value={question.option3}/>
+            </div>
+
+            <div>
+              <label for={question.option4}>{question.option1}</label>
+              <input type="radio" name={question.question} value={question.option4}/>
             </div>
           </div>
-        ))}
+        ))
+      ) : (
+        <p>Loading questions...</p>
+      )}
         <Link to={"/TestScoreAndHomework"}>
         <button type="submit" className="submit-btn">Submit</button>
         </Link>
-      </form>
     </div>
   );
 };
