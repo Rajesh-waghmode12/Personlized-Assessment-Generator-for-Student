@@ -216,11 +216,13 @@ def getTestQuestions(request):
         id = request.GET.get('id')
         print(id)
         allQuestions = Assignment.objects.filter(assignment_id = id).values('assignment_json')
+        title = Assignment.objects.filter(assignment_id = id).values('title')
         allQuestions_list = list(allQuestions)
+        title_value = list(title)
 
         # Print the list of JSON objects
         print("Assignment JSON:")
         print(allQuestions_list)
-        return JsonResponse({"allTestQuestions": allQuestions_list}, status=200)
+        return JsonResponse({"allTestQuestions": allQuestions_list, "title":title_value}, status=200)
     else:
         return JsonResponse({"error": "Only GET requests are allowed"}, status=405)

@@ -21,8 +21,8 @@ const RecentTests = () => {
           }
 
           const data = await response.json();
-          console.log('Test Titles:', data.unique_titles_list);
-          console.log('Test ids:', data.unique_ids);
+          //console.log('Test Titles:', data.unique_titles_list);
+          //console.log('Test ids:', data.unique_ids);
           setTestTitles(data.unique_titles_list);
           setTestIds(data.unique_ids);
         }

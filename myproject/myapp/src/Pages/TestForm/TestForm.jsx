@@ -19,7 +19,7 @@ const TestForm = () => {
 
   const addFields = () => {
     let newField = {question:"", option1:"", option2:"",option3:"", option4:"", correct:""}
-    setInputFields([...inputFields,newField])
+    setInputFields([...inputFields,newField]);
   }
   
   const [testTitle, setTestTitle] = useState('');
