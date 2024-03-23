@@ -1,15 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import './Quiz.css';
-import { Link,useNavigate, useParams } from 'react-router-dom';
+import {useNavigate, useParams } from 'react-router-dom';
+import DataContext from '../DataContext';
 
 const Quiz = () => {
-  const { id } = useParams();
+  const { id, username } = useParams();
   //console.log(id);
+  //console.log(username);
   const [title, setTitle] = useState("");
   const navigate = useNavigate();
   const [testQuestions, setTestQuestions] = useState([]);
-  const [totalQuestions, setTotalQuetions] = useState(0);
+  //const [totalQuestions, setTotalQuetions] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
+  const { setQuizData } = useContext(DataContext);
+
+  const [showModal, setShowModal] = useState(false);
+
+  const openModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
+  const [modalText , setModeltext] = useState("Are ou sure ?");
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -19,9 +28,10 @@ const Quiz = () => {
       //console.log(data1.title[0].title);
       setTitle(data1.title[0].title);
       const data2 = data1.allTestQuestions[0].assignment_json;
-      console.log(data2);
+      //console.log(data2);
       setTestQuestions(data2);
-      setTotalQuetions(data2.length);
+      //setTotalQuetions(data2.length);
+
 
         // Log the first question and its options
         // console.log("Question:", testQuestions[0].question);
@@ -37,7 +47,7 @@ const Quiz = () => {
     fetchQuestions();
   }, [id]);
 
-  console.log(totalQuestions);
+  //console.log(totalQuestions);
   const handleAnswerSelection = (index,question , selectedOption) => {
     setSelectedAnswers(prevState => ({
       ...prevState,
@@ -46,12 +56,54 @@ const Quiz = () => {
   };
 
 
-  const handleSubmit = () =>{
-    console.log(selectedAnswers);
-    navigate('/TestScoreAndHomework');
-  }
+  const handleSubmit = async () =>{
+    closeModal();
+    setModeltext("Sumitted! Wait for a While...");
+    openModal();
+    //console.log(selectedAnswers);
+    const formData = {
+      studentName : username,
+      testId : id,
+      testTitle : title,
+      answersheet : selectedAnswers
+    }
 
-  
+    try {
+      const response = await fetch('http://localhost:8000/submitTest/',{
+        method : 'POST',
+        headers : {
+          'content-Type' : 'application/json'
+        },
+        body : JSON.stringify(formData)
+      });
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`);
+        
+      }
+      const responseData = await response.json(); // Parse the JSON response
+     
+      console.log("testTitle:",responseData.testTitle);
+      console.log("marks_achieved:", responseData.marks_achieved);
+      console.log("Total Marks:", responseData.total_marks);
+      const achieved = responseData.marks_achieved;
+      const total = responseData.total_marks;
+      const title = responseData.testTitle;
+      const homework = responseData.homework;
+      setQuizData({
+        studentName: username,
+        total: total,
+        achieved: achieved,
+        title: title,
+        homework:homework
+    });
+      
+      //alert("Test Submitted");
+      navigate('/TestScoreAndHomework');
+    }catch(error){
+      console.log(error);
+    }
+    
+  }
 
   return (
     <div className="quiz-container">
@@ -106,10 +158,22 @@ const Quiz = () => {
         <p>Loading questions...</p>
       )}
 
-      <button type="submit" className="submit-btn" onClick={handleSubmit}>Submit</button>
-        {/* <Link to={"/TestScoreAndHomework"}>
-        
-        </Link> */}
+      <button type="submit" className="submit-btn" onClick={openModal}>Submit</button>
+      
+      {showModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={closeModal}>
+              &times;
+            </span>
+            <p>{modalText}</p>
+            <div className="button-container">
+              <button onClick={closeModal}>Cancel</button>
+              <button onClick={handleSubmit}>Submit</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

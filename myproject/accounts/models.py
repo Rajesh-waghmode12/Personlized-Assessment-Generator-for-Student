@@ -77,3 +77,17 @@ class StudentsClass(models.Model):
     Teacher_id = models.IntegerField(unique = False)
     join_date = models.DateTimeField(auto_now = True)
     release_date = models.DateTimeField(auto_now_add=True)
+
+
+class AnswerSheet(models.Model):
+    answersheet_id = models.AutoField(primary_key=True)
+    Student_id = models.IntegerField()
+    test_id = models.IntegerField(max_length=255)
+    answersheet_json = models.JSONField()
+    achieved_marks = models.IntegerField()
+    total_marks = models.IntegerField()
+    result_generated = models.TextField()
+    modified_at = models.DateTimeField(auto_now = True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+    class_id = models.IntegerField(null=True)

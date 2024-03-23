@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './Pages/Login/login';
 import Register from './Pages/Register/register';
@@ -12,14 +12,10 @@ import TestForm from './Pages/TestForm/TestForm';
 import RecentTests from './Pages/RecentTests/RecentTests';
 import Quiz from './Pages/Quiz/Quiz';
 import TestScoreAndHomework from './Pages/TestScoreAndHomework/TestScoreAndHomework';
-
+import DataContext from './Pages/DataContext';
 
 function App() {
-  const homeworkQestions = [
-    "asd",
-    "xyz",
-    "qtr"
-  ];
+  const [quizData, setQuizData] = useState({});
   return (
     <Router>
     <Routes>
@@ -32,10 +28,12 @@ function App() {
       
       {/*<Route path="/subject/:subjectId" element={<SubjectDetailPage/>} /> */}
       <Route path='/createTest/:username' element={<TestForm/>} />
-      <Route path="/quiz/:id" element={<Quiz/>} />
+      
+      <Route path="/quiz/:username/:id" element={<DataContext.Provider value={{ quizData, setQuizData }}><Quiz/></DataContext.Provider>} />
+      <Route path='/TestScoreAndHomework' element={<DataContext.Provider value={{quizData, setQuizData}}><TestScoreAndHomework/></DataContext.Provider>} />
+    
       <Route path="/subjectpage/:username" element={<SubjectDetailPage/>} />  
       <Route path='/recentTests/:username' element={<RecentTests/>} />
-      <Route path='/TestScoreAndHomework' element={<TestScoreAndHomework score={13} total = {20} homework={homeworkQestions}/>} />
     </Routes>
   </Router>
   );

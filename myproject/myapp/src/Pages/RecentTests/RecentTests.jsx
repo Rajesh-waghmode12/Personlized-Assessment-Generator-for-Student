@@ -7,6 +7,8 @@ const RecentTests = () => {
   const [testIds, setTestIds] = useState([]);
   const { username } = useParams();
 
+  const[attemptedTests,setAttemptedTests] = useState([]);
+
   useEffect(()=>{
     const fetchData = async () =>{
         try {
@@ -30,6 +32,21 @@ const RecentTests = () => {
           console.error('Error fetching test titles:', error);
         }
     }
+
+    const fetchAttempted = async() =>{
+        const response = await fetch(`http://localhost:8000/attemptedTests/?username=${username}`,{
+          method : 'GET',
+          headers : {
+            'content-Type' : 'application/json'
+          }
+        })
+        if(!response.ok){
+          throw new Error("Network response was not okay");
+        }
+        const data = await response.json();
+        setAttemptedTests(data.test);
+    }
+    fetchAttempted();
     fetchData();
 
   },[username]);
@@ -42,23 +59,34 @@ const RecentTests = () => {
             Logout
         </button>
       </div>
+      <div className='testbody'>
       <div className="recent-test">
-      <h2>Recent Tests</h2>
-      <div>
-      
-        
-        {testIds.map((id, index) => (
-          <Link to={`/quiz/${id}`} key={index}>
-        <div className='tests-list' key={index}>
-         <input className='ids' type="text" value={id} readOnly/>
-         <input type="text" value={testTitles[index]} readOnly/>
-          <button>→</button>
+        <h2>Recent Tests</h2>
+        <div className="recent-tests-container">
+          {testIds.map((id, index) => (
+            <Link to={`/quiz/${username}/${id}`} key={index}>
+            <div className='recent-tests-list' key={index}>
+              <input className='ids' type="text" value={id} readOnly/>
+              <input type="text" value={testTitles[index]} readOnly/>
+              <button>→</button>
+            </div>
+          </Link>
+          ))}
+          </div>
         </div>
-         </Link>
-        ))}
-       
+        <div className="attempted-test">
+        <h2>Attempted Tests</h2>
+        <div className="attempted-tests-container">
+          {attemptedTests.map(test => (
+            <div className='attempted-tests-list' key={test.assignment_id}>
+              <input className='ids' type="text" value={test.assignment_id} readOnly/>
+              <input type="text" value={test.title} readOnly/>
+              <button>→</button>
+            </div>
+          ))}
+          </div>
         </div>
-      </div>
+        </div>
     </div>
   );
 };

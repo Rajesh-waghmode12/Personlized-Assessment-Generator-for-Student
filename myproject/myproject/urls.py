@@ -32,5 +32,7 @@ urlpatterns = [
     path("getmembers/",views.getmembers , name = "getmembers_view"),
     path('addStudentinclass/', views.saveStudentInClass_view, name='saveStudentInClass'),
     path("recentTestForStudent/", views.getRecentTestsForStudent, name='getrecentTestView'),
-    path("getTestQuestions/",views.getTestQuestions,name="getTestQuestions")
+    path("attemptedTests/",views.getAttemptedTests, name="getAttemptedTests"),
+    path("getTestQuestions/",views.getTestQuestions,name="getTestQuestions"),
+    path("submitTest/", views.answersheetSubmitView, name="answersheetSubmitView")
 ]

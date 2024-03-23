@@ -1,61 +1,88 @@
-.recent-tests-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr; /* Two equal columns */
-  gap: 20px;
-  padding: 20px;
-}
-
 .header {
-  grid-column: 1 / -1; /* Header will span across all columns */
   background-color: #4B79A1; /* Dark blue background */
   color: white;
-  padding: 10px 20px;
   border-radius: 8px;
   font-size: 24px;
   display: flex;
   text-align: center;
   margin-bottom: 20px;
   position: fixed;
-  width: 80%;
+  width: 100%;
+  padding: 10px 20px;
 }
-
+.testbody{
+  display: flex;
+  margin-top: 40px;
+}
 .username{
   flex: 90%;
+
 }
 .logout-btn{
   flex: 5%;
+  margin-right: 50px;
 }
-  
 .recent-test{
-  margin-top: 40px;
+  flex: 50%;
+  width: 50%;
 }
-  .recent-test.ul {
-    list-style: none;
-    padding: 0;
-    text-decoration: none;
+  .recent-test h2{
+    margin-left: 20px;
   }
-  .tests-list{
+  .recent-tests-container{
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+  }
+  .recent-tests-list{
+    display: flex;
+    background-color: antiquewhite;
+    justify-content: center;
     align-items: center;
-    cursor: pointer;
-    margin-top: 5px;
-    background-color: #77afdf;
-    border-radius: 5%;
+    border-radius: 10px;
+    margin: 5px;
   }
   .ids{
-    width: 30px;
-    text-decoration: none;
-    background: transparent;
-    cursor: pointer;
+    width: 20px;
   }
-  .tests-list input{
-    text-decoration: none;
-    cursor: pointer;
+  .recent-tests-list input{
     border: none;
+    margin-top: 5px;
     background: transparent;
+    text-decoration: none;
+  }
+  .recent-tests-list button{
+    padding: 5px;
+    margin-right: 5px;
+    border: none;
+    text-decoration: none;
   }
 
-  
-  
- 
+
+  .attempted-test{
+    flex:50%;
+    width: 50%;
+  }
+
+  .attempted-tests-container{
+    display: flex;
+    flex-direction: column;
+    
+  }
+  .attempted-tests-list{
+    display: flex;
+    background-color: antiquewhite;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    margin: 5px;
+  }
+
+  .attempted-tests-list input{
+    border: none;
+    margin-top: 5px;
+    background: transparent;
+  }
+  .attempted-tests-list button{
+    padding: 5px;
+    margin-right: 5px;
+  }

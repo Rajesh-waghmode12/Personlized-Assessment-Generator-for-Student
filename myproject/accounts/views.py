@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import UserProfile, Teacher, Student , Assignment , StudentsClass
+from .models import UserProfile, Teacher, Student , Assignment , StudentsClass , AnswerSheet
 from django.contrib.auth.models import User
 from django.db import transaction
 import json
@@ -8,6 +8,9 @@ from django.http import JsonResponse
 from django.contrib.auth import authenticate,login, logout
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
+from django.db.models import Subquery
+
+import google.generativeai as genai
 
 @api_view(['POST'])
 @transaction.atomic
@@ -17,7 +20,7 @@ def register_user(request):
     mobile = request.data.get('mobile')
     role = request.data.get('role')
     full_name = request.data.get('name')
-    print(email, mobile, role, full_name)
+    #print(email, mobile, role, full_name)
 
     if not email or not password:
         return JsonResponse({'error': 'Email and password are required.'}, status=400)
@@ -29,7 +32,7 @@ def register_user(request):
     user_profile = UserProfile.objects.create(user=user, email=email, role=role, full_name=full_name)
 
     # Depending on the role, create either Teacher or Student instance
-    print(role)
+    #print(role)
     if role == '1':
         teacher = create_teacher(user_profile, mobile, full_name)
         if teacher is None:
@@ -57,7 +60,7 @@ def login_view(request):
     loggedin_user = UserProfile.objects.get(user=user)
     full_name = loggedin_user.full_name
     
-    print(full_name)
+    #print(full_name)
 
     login(request, user)
     return JsonResponse({"details":"Login Successful","role":role,"username":full_name})
@@ -82,7 +85,7 @@ def whoami_view(request):
 @transaction.atomic
 def create_teacher(user_profile, mobile, full_name):
     print(user_profile,mobile,full_name)
-    print("in the teacher function")
+    #print("in the teacher function")
     try:
         teacher = Teacher.objects.create(user_profile=user_profile, mobile_no=mobile, full_name=full_name)
         teacher.save()
@@ -93,7 +96,7 @@ def create_teacher(user_profile, mobile, full_name):
 
 @transaction.atomic
 def create_student(user_profile, mobile, full_name):
-    print("in the student function")
+    #print("in the student function")
     try:
         student = Student.objects.create(user_profile=user_profile, mobile_no=mobile, full_name=full_name)
         student.save()
@@ -113,7 +116,7 @@ def createTest_view(request):
         
         teacher = Teacher.objects.get(full_name=username)
         teacher_id = teacher.teacher_id
-        print(teacher_id)
+        #print(teacher_id)
 
         # print("username",username)
         # print("title",title)
@@ -171,7 +174,7 @@ def saveStudentInClass_view(request):
         username = data.get('username')
         teacher = Teacher.objects.get(full_name=username)
         teacher_id = teacher.teacher_id
-        print(name,email,mobile, "teacher usernme-",username, teacher_id)
+        #print(name,email,mobile, "teacher usernme-",username, teacher_id)
         try:
             addStudent = StudentsClass.objects.create(
                 sname = name, 
@@ -190,17 +193,29 @@ def getRecentTestsForStudent(request):
     if request.method == 'GET':
         username = request.GET.get('username')
         #print(username)
-        students_classes = StudentsClass.objects.filter(sname="vishal")
+        students_classes = StudentsClass.objects.filter(sname=username)
         unique_teacher_ids = students_classes.values_list('Teacher_id', flat=True).distinct()
         # for id in unique_teacher_ids:
         #     print(id)
-        assignments = Assignment.objects.filter(Teacher_id__in=unique_teacher_ids)
+        #assignments = Assignment.objects.filter(Teacher_id__in=unique_teacher_ids)
+
+        not_attempted_assignments = Assignment.objects.exclude(
+            assignment_id__in=Subquery(
+                AnswerSheet.objects.values('test_id').distinct()
+            )
+        ).filter(Teacher_id__in=unique_teacher_ids)
+        #print(not_attempted_assignments)
+        unique_titles_list = list(not_attempted_assignments.values_list('title', flat=True))
+        unique_test_ids = list(not_attempted_assignments.values_list('assignment_id', flat=True))
+
+        print(unique_titles_list)
+        print(unique_test_ids)
         #unique_titles = assignments.values_list('title', flat=True).distinct()
-        unique_ids = assignments.values_list('assignment_id', flat=True).distinct()
-        unique_titles = Assignment.objects.filter(assignment_id__in=unique_ids).values_list('title', flat=True)
+        # unique_ids = assignments.values_list('assignment_id', flat=True).distinct()
+        # unique_titles = Assignment.objects.filter(assignment_id__in=unique_ids).values_list('title', flat=True)
         
-        unique_titles_list = list(unique_titles)
-        unique_test_ids = list(unique_ids)
+        # unique_titles_list = list(unique_titles)
+        # unique_test_ids = list(unique_ids)
 
         # for title, id in zip(unique_titles, unique_ids):
         #     print(title, " ", id)
@@ -214,15 +229,101 @@ def getRecentTestsForStudent(request):
 def getTestQuestions(request):
     if request.method == 'GET':
         id = request.GET.get('id')
-        print(id)
+        #print(id)
         allQuestions = Assignment.objects.filter(assignment_id = id).values('assignment_json')
         title = Assignment.objects.filter(assignment_id = id).values('title')
         allQuestions_list = list(allQuestions)
         title_value = list(title)
 
         # Print the list of JSON objects
-        print("Assignment JSON:")
-        print(allQuestions_list)
+        # print("Assignment JSON:")
+        # print(allQuestions_list)
         return JsonResponse({"allTestQuestions": allQuestions_list, "title":title_value}, status=200)
     else:
         return JsonResponse({"error": "Only GET requests are allowed"}, status=405)
+    
+def answersheetSubmitView(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        sname = data.get('studentName')
+        print(sname)
+        student = Student.objects.get(full_name=sname)
+        sid = student.student_id
+        print(sid)
+        testId = data.get('testId')
+        testTitle = data.get('testTitle')
+        testQues = Assignment.objects.filter(assignment_id = testId).values('assignment_json')
+        #test_questions = testQues[0]['assignment_json']
+        test_questions = list(testQues)[0]['assignment_json']
+        answer_sheet = data.get('answersheet')
+        #print(testId)
+        #print(test_questions)
+        #print(answer_sheet)
+
+      
+
+        total_marks = 0
+        marks_achieved = 0
+        incorrect_questions = []
+        for question_index, question in enumerate(test_questions):
+                correct_answer = question['correct']
+                selected_answer = answer_sheet[str(question_index)]['selectedOption']
+
+                if correct_answer == selected_answer:
+                    marks_achieved += int(question['mark'])  # Convert mark to integer
+                else:
+                    incorrect_questions.append(question)
+
+                total_marks += int(question['mark'])
+
+        questions = []
+        if len(incorrect_questions) == 0:
+            for que in test_questions:
+                questions.append(que['question'])
+        else:
+            for que in incorrect_questions:
+                questions.append(que['question'])
+        
+        API_KEY = "AIzaSyCDdkwbmzlOyLhkhwuH_ovi2KQNYrl2xPg"
+
+        genai.configure(api_key=API_KEY)
+        model = genai.GenerativeModel('gemini-pro')
+        prompt = "I would like you to act as my teacher and create assessment test for my students. I will provide you some reference questions and {testTitle} as a starting point. Can you suggest some homework and assessment for student?"
+        messages = [{'role':'user', 'parts': [prompt] + questions}]
+        response = model.generate_content(messages)
+
+        try:
+            answersheet = AnswerSheet.objects.create(
+               Student_id = sid,
+               test_id = testId,
+               answersheet_json = answer_sheet,
+               achieved_marks = marks_achieved,
+               total_marks = total_marks,
+               result_generated = response.text
+            )
+            answersheet.save()
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+        
+
+        return JsonResponse({'total_marks': total_marks,'marks_achieved': marks_achieved,'testTitle':testTitle,"homework":response.text}, status=200)
+    else:
+        return JsonResponse({"error": "error occured while submitting"}, status=405)
+    
+def getAttemptedTests(request):
+    if request.method == 'GET':
+        username = request.GET.get('username')
+        student = Student.objects.get(full_name=username)
+        sid = student.student_id
+        print(sid)
+        testIds = AnswerSheet.objects.filter(Student_id = sid).values('test_id').distinct()
+        test_titles = Assignment.objects.filter(assignment_id__in=testIds).values('assignment_id', 'title')
+
+        test_titles_list = list(test_titles)  # Convert queryset to list of dictionaries
+        print(test_titles_list)
+        # testIds_list = list(testIds)  # Convert queryset to list of dictionaries
+        # print(testIds_list)
+
+        return JsonResponse({'test': test_titles_list}, status=200)
+    else:
+        return JsonResponse({"error": "error occured while submitting"}, status=405)
