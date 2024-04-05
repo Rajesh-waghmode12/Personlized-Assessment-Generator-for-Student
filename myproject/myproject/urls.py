@@ -34,5 +34,6 @@ urlpatterns = [
     path("recentTestForStudent/", views.getRecentTestsForStudent, name='getrecentTestView'),
     path("attemptedTests/",views.getAttemptedTests, name="getAttemptedTests"),
     path("getTestQuestions/",views.getTestQuestions,name="getTestQuestions"),
-    path("submitTest/", views.answersheetSubmitView, name="answersheetSubmitView")
+    path("submitTest/", views.answersheetSubmitView, name="answersheetSubmitView"),
+    path("getAnswers/", views.getAnswersView, name="getAnswersView")
 ]

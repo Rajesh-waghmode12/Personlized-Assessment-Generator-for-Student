@@ -327,3 +327,22 @@ def getAttemptedTests(request):
         return JsonResponse({'test': test_titles_list}, status=200)
     else:
         return JsonResponse({"error": "error occured while submitting"}, status=405)
+    
+def getAnswersView(request):
+    if request.method == 'GET':
+        assignmentid = request.GET.get('id')
+        susername = request.GET.get("username")
+
+        student = Student.objects.get(full_name=susername)
+        sid = student.student_id
+
+        test = Assignment.objects.get(assignment_id=assignmentid)
+        answer_sheet = AnswerSheet.objects.get(Student_id=sid, test_id=assignmentid)
+        test_title = test.title
+        achieved_marks = answer_sheet.achieved_marks
+        total_marks = answer_sheet.total_marks
+        homework = answer_sheet.result_generated
+        
+        return JsonResponse({'testTitle': test_title, 'achievedMarks':achieved_marks,'totalMarks':total_marks, 'resultRenegated':homework}, status=200)
+    else:
+        return JsonResponse({"error": "error occured while submitting"}, status=405)

@@ -51,18 +51,21 @@ function AddMemberModal({ isOpen, onClose, username }) {
           placeholder="Enter name"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          required
         />
         <input 
           type="tel"
           placeholder="Enter mobile"
           value={mobile}
           onChange={(e) => setMobile(e.target.value)}
+          required
         />
         <input 
           type="email"
           placeholder="Enter email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
         />
         <button onClick={handleAdd}>Add</button>
       </div>
