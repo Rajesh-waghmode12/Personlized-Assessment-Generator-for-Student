@@ -1,0 +1,55 @@
+.questionForm{
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+.questions{
+  flex:80%;
+}
+.remove-button{
+  flex:20%;
+  margin-left: 30px;
+}
+.submit-button{
+  margin-left: 20px;
+}
+.question-mark-field{
+  display: flex;
+}
+.mark-field{
+  margin-left: 30px;
+  width: 50px;
+}
+.option{
+  width: 200px;
+  margin: 10px;
+}
+.title-marks-field{
+  display: flex;
+}
+.marks-field{
+  width: 150px;
+  margin-left: 20px;
+}
+.subject-header {
+  grid-column: 1 / -1; /* Header will span across all columns */
+  background-color: #4B79A1; /* Dark blue background */
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 24px;
+  display: flex;
+  text-align: center;
+  margin-bottom: 20px;
+}
+  @media (max-width: 768px) {
+    .option-input-container, .question-content, .test-question {
+      align-items: stretch;
+    }
+  
+    .remove-option-button, .remove-question-button {
+      margin-top: 5px;
+      width: 100%;
+    }
+  }
+  

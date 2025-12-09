@@ -1,0 +1,121 @@
+.homepage {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+  }
+  
+  .top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 5%;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .logo {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #5D55FA;
+  }
+  
+  .nav-links {
+    display: flex;
+  }
+  
+  .nav-button {
+    padding: 0.5rem 1rem;
+    margin: 0 0.5rem;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .login-button {
+    background-color: #FF6B6B;
+    color: white;
+  }
+  a.nav-button.login-button {
+    width: 100px;
+}
+  
+  .register-button {
+    background-color: #4ECDC4;
+    color: white;
+  }
+  
+  .login-button:hover, .register-button:hover {
+    opacity: 0.9;
+  }
+  
+  .hero {
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(to right, #e0eafc, #cfdef3);
+  }
+  
+  .hero-title {
+    margin: 2rem 0;
+    font-size: 3rem;
+    color: #333;
+  }
+  
+  .hero-illustration {
+    max-width: 100%;
+    height: 100%;
+  }
+  .content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    gap: 2rem; /* Adjust as needed */
+  }
+  
+  .image-container {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .education-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px; /* Optional for rounded corners */
+  }
+  
+  .quotes-container {
+    flex: 1;
+    max-width: 600px; /* Adjust as needed */
+  }
+  
+  .education-quote {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    font-style: italic;
+    color: #555;
+    padding: 1rem;
+    border-left: 4px solid #5D55FA;
+    margin: 0;
+  }
+  
+  /* Responsive design adjustments */
+  @media (max-width: 768px) {
+    .content {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .image-container,
+    .quotes-container {
+      flex: none;
+      max-width: 100%;
+    }
+  
+    .education-quote {
+      border-left: none;
+      border-top: 4px solid #5D55FA;
+      display: inline-block;
+      margin-top: 2rem;
+    }
+  }
+  
